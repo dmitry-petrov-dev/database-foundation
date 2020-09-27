@@ -1,0 +1,78 @@
+# Практическое задание по теме “NoSQL”
+# 1. В базе данных Redis подберите коллекцию для подсчета посещений с определенных IP-адресов.
+
+dpetrov@ubuntu:~$ redis-cli
+127.0.0.1:6379> HELP PING
+
+  PING [message]
+  summary: Ping the server
+  since: 1.0.0
+  group: connection
+
+127.0.0.1:6379> SET 127.0.0.1 1
+OK
+127.0.0.1:6379> INCR 127.0.0.1
+(integer) 2
+127.0.0.1:6379> SET 127.0.0.2 1
+OK
+127.0.0.1:6379> INCR 127.0.0.2
+(integer) 2
+127.0.0.1:6379> GET 127.0.0.1
+"2"
+127.0.0.1:6379> GET 127.0.0.2
+"2"
+127.0.0.1:6379> 
+
+# 2. При помощи базы данных Redis решите задачу поиска имени пользователя по электронному адресу и наоборот, поиск электронного адреса пользователя по его имени.
+
+127.0.0.1:6379> HSET user "vasya pupkin" vasya@pupkin.com
+(integer) 1
+127.0.0.1:6379> HSET user vasya@pupkin.com "vasya pupkin"
+(integer) 1
+127.0.0.1:6379> HGET user "vasya pupkin"
+"vasya@pupkin.com"
+127.0.0.1:6379> HGET user vasya@pupkin.com
+"vasya pupkin"
+127.0.0.1:6379> HVALS user
+1) "vasya@pupkin.com"
+2) "vasya pupkin"
+
+# 3. Организуйте хранение категорий и товарных позиций учебной базы данных shop в СУБД MongoDB.
+dpetrov@ubuntu:~$ mongo
+MongoDB shell version v3.6.3
+connecting to: mongodb://127.0.0.1:27017
+MongoDB server version: 3.6.3
+Server has startup warnings: 
+2020-09-08T11:14:12.842+0300 I STORAGE  [initandlisten] 
+2020-09-08T11:14:12.842+0300 I STORAGE  [initandlisten] ** WARNING: Using the XFS filesystem is strongly recommended with the WiredTiger storage engine
+2020-09-08T11:14:12.842+0300 I STORAGE  [initandlisten] **          See http://dochub.mongodb.org/core/prodnotes-filesystem
+2020-09-08T11:14:13.842+0300 I CONTROL  [initandlisten] 
+2020-09-08T11:14:13.842+0300 I CONTROL  [initandlisten] ** WARNING: Access control is not enabled for the database.
+2020-09-08T11:14:13.842+0300 I CONTROL  [initandlisten] **          Read and write access to data and configuration is unrestricted.
+2020-09-08T11:14:13.842+0300 I CONTROL  [initandlisten] 
+> use shop
+switched to db shop
+> db.shop.insert({"name":"catalogs", "values":['Процессоры', 'Материнские платы', 'Видеокарты', 'Жесткие диски', 'Оперативная память']})
+WriteResult({ "nInserted" : 1 })
+> db.shop.find()
+{ "_id" : ObjectId("5f57bd2da88545485439cd0b"), "name" : "catalogs", "values" : [ "Процессоры", "Материнские платы", "Видеокарты", "Жесткие диски", "Оперативная память" ] }
+> db.shop.insert({"name": "products", "products": [{"name": 'Intel Core i3-8100', "description": 'Процессор для настольных персональных компьютеров, основанных на платформе Intel.', "price": 7890.00,  "catalog":'Процессоры', "created_at": new Date(), "updated_at": new Date()}]})
+WriteResult({ "nInserted" : 1 })
+> db.shop.update({"name": "products"}, {$push:{"products": {"name": 'Intel Core i5-7400', "description": 'Процессор для настольных персональных компьютеров, основанных на платформе Intel.', "price": 12700.00, "catalog":'Процессоры', "created_at": new Date(), "updated_at": new Date()}}})
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+> db.shop.update({"name": "products"}, {$push:{"products": {"name": 'Intel Core i5-7400', "description": 'Процессор для настольных персональных компьютеров, основанных на платформе Intel.', "price": 12700.00, "catalog":'Процессоры', "created_at": new Date(), "updated_at": new Date()}}})
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+> db.shop.update({"name": "products"}, {$push:{"products": {"name": 'AMD FX-8320E', "description": 'Процессор для настольных персональных компьютеров, основанных на платформе AMD.', "price": 4780.00, "catalog":'Процессоры', "created_at": new Date(), "updated_at": new Date()}}})
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+> db.shop.update({"name": "products"}, {$push:{"products": {"name": 'AMD FX-8320', "description": 'Процессор для настольных персональных компьютеров, основанных на платформе AMD.', "price": 7120.00, "catalog":'Процессоры', "created_at": new Date(), "updated_at": new Date()}}})
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+> db.shop.update({"name": "products"}, {$push:{"products": {"name": 'ASUS ROG MAXIMUS X HERO', "description": 'Материнская плата ASUS ROG MAXIMUS X HERO, Z370, Socket 1151-V2, DDR4, ATX', "price": 19310.00, "catalog":'Материнские платы', "created_at": new Date(), "updated_at": new Date()}}})
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+> db.shop.update({"name": "products"}, {$push:{"products": {"name": 'Gigabyte H310M S2H', "description": 'Материнская плата Gigabyte H310M S2H, H310, Socket 1151-V2, DDR4, mATX', "price": 4790.00, "catalog":'Материнские платы', "created_at": new Date(), "updated_at": new Date()}}})
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+> db.shop.update({"name": "products"}, {$push:{"products": {"name": 'MSI B250M GAMING PRO', "description": 'Материнская плата MSI B250M GAMING PRO, B250, Socket 1151, DDR4, mATX', "price": 5060.00, "catalog":'Материнские платы', "created_at": new Date(), "updated_at": new Date()}}})
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+> db.shop.find()
+{ "_id" : ObjectId("5f57bd2da88545485439cd0b"), "name" : "catalogs", "values" : [ "Процессоры", "Материнские платы", "Видеокарты", "Жесткие диски", "Оперативная память" ] }
+{ "_id" : ObjectId("5f57c398a88545485439cd0c"), "name" : "products", "products" : [ { "name" : "Intel Core i3-8100", "description" : "Процессор для настольных персональных компьютеров, основанных на платформе Intel.", "price" : 7890, "catalog" : "Процессоры", "created_at" : ISODate("2020-09-08T17:47:04.910Z"), "updated_at" : ISODate("2020-09-08T17:47:04.910Z") }, { "name" : "Intel Core i5-7400", "description" : "Процессор для настольных персональных компьютеров, основанных на платформе Intel.", "price" : 12700, "catalog" : "Процессоры", "created_at" : ISODate("2020-09-08T17:52:16.284Z"), "updated_at" : ISODate("2020-09-08T17:52:16.284Z") }, { "name" : "Intel Core i5-7400", "description" : "Процессор для настольных персональных компьютеров, основанных на платформе Intel.", "price" : 12700, "catalog" : "Процессоры", "created_at" : ISODate("2020-09-08T17:59:32.724Z"), "updated_at" : ISODate("2020-09-08T17:59:32.724Z") }, { "name" : "AMD FX-8320E", "description" : "Процессор для настольных персональных компьютеров, основанных на платформе AMD.", "price" : 4780, "catalog" : "Процессоры", "created_at" : ISODate("2020-09-08T17:59:41.690Z"), "updated_at" : ISODate("2020-09-08T17:59:41.690Z") }, { "name" : "AMD FX-8320", "description" : "Процессор для настольных персональных компьютеров, основанных на платформе AMD.", "price" : 7120, "catalog" : "Процессоры", "created_at" : ISODate("2020-09-08T17:59:48.718Z"), "updated_at" : ISODate("2020-09-08T17:59:48.718Z") }, { "name" : "ASUS ROG MAXIMUS X HERO", "description" : "Материнская плата ASUS ROG MAXIMUS X HERO, Z370, Socket 1151-V2, DDR4, ATX", "price" : 19310, "catalog" : "Материнские платы", "created_at" : ISODate("2020-09-08T17:59:58.221Z"), "updated_at" : ISODate("2020-09-08T17:59:58.221Z") }, { "name" : "Gigabyte H310M S2H", "description" : "Материнская плата Gigabyte H310M S2H, H310, Socket 1151-V2, DDR4, mATX", "price" : 4790, "catalog" : "Материнские платы", "created_at" : ISODate("2020-09-08T18:00:04.815Z"), "updated_at" : ISODate("2020-09-08T18:00:04.815Z") }, { "name" : "MSI B250M GAMING PRO", "description" : "Материнская плата MSI B250M GAMING PRO, B250, Socket 1151, DDR4, mATX", "price" : 5060, "catalog" : "Материнские платы", "created_at" : ISODate("2020-09-08T18:00:12.536Z"), "updated_at" : ISODate("2020-09-08T18:00:12.536Z") } ] }
+> 
